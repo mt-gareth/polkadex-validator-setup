@@ -2,7 +2,7 @@
 
 Right now this set of scripts only creates a validator, full node will be added later.
 
-This set of Ansible scripts are ported over from [https://github.com/w3f/polkadot-validator-setup/](W3F's Polkadot Validator Setup) in order to work with Polkadex.
+This set of Ansible scripts are ported over from [W3F's Polkadot Validator Setup](https://github.com/w3f/polkadot-validator-setup/) in order to work with Polkadex.
 To use the ansible scripts, go to the ansible directory and make an `inventory.yml` based on `inventory.sample` to suit your setup.
 Then run `setup.sh` like this:
 
