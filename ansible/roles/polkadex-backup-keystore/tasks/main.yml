@@ -1,0 +1,5 @@
+- name: backup keystore
+  copy:
+    src: "/home/polkadex/.local/share/polkadex/chains/{{ polkadex_network_id }}/keystore"
+    dest: /home/polkadex/keystore
+    remote_src: yes

@@ -1,0 +1,10 @@
+---
+# defaults file for polkadex-validator
+proxy_port: 80
+p2p_port: 30333
+chain: "./customSpecRaw.json"
+bootnodes: "/ip4/13.235.190.203/tcp/30333/p2p/12D3KooWMJ4AMmzpRbv914ZGZR6ehBhcZvGtqYid5jxSx8vXiSr7"
+polkadex_network_id: "ksmcc3"
+subkey_binary_url: 'https://github.com/w3f/substrate/releases/download/e0f3fa/subkey'
+subkey_binary_checksum: 'sha256:f74a06442e76c3bb97d27a168b9710ef062ae5640ad82e7d42b8fb613f8be9d9'
+build_dir: '/tmp'

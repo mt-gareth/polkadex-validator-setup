@@ -1,0 +1,11 @@
+---
+- name: create polkadex group
+  group:
+    name: polkadex
+    state: present
+
+- name: add polkadex user
+  user:
+    name: polkadex
+    group: polkadex
+    append: yes

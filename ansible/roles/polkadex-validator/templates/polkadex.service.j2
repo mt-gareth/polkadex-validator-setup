@@ -1,0 +1,25 @@
+{# --- PREPARE VARIABLES #}
+{% set node_name = hostvars[inventory_hostname].node_name|default(None) %}
+{% set bootnodes = hostvars[inventory_hostname].bootnodes|default(None) %}
+{# --- #}
+[Unit]
+Description=Polkadex Node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=polkadex
+Group=polkadex
+ExecStart=/usr/local/bin/polkadex \
+  --name {{ '\"' + node_name + '\"' }} \
+  --validator \
+  --chain=/usr/local/bin/customSpecRaw.json \
+  {% if bootnodes is not none and bootnodes|length %}
+  --bootnodes {{ bootnodes }} \
+  {% endif %}
+
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

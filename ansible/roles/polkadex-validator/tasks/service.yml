@@ -1,0 +1,24 @@
+---
+- name: cronjob for restarting polkadex service
+  cron:
+    name: "restart polkadex"
+    minute: "{{ polkadex_restart_minute }}"
+    hour: "{{ polkadex_restart_hour }}"
+    day: "{{ polkadex_restart_day }}"
+    month: "{{ polkadex_restart_month }}"
+    weekday: "{{ polkadex_restart_weekday }}"
+    job: "/bin/systemctl restart polkadex.service"
+  when: "polkadex_restart_enabled|default(false)|bool"
+
+- name: register public ip
+  uri:
+    url: https://api.ipify.org?format=json
+  register: public_ip
+
+- name: create polkadex service file
+  template:
+    src: polkadex.service.j2
+    dest: /etc/systemd/system/polkadex.service
+    owner: root
+    group: root
+    mode: 0600

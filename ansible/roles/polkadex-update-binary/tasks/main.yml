@@ -1,0 +1,46 @@
+---
+# tasks file for polkadex-update-binary
+ - name: get currently polkadex sha256
+   shell: |
+     sha256sum /usr/local/bin/polkadex | sed -n 's/^\(\S*\).*/sha256:\1/p'
+   args:
+     executable: /bin/bash
+   register: polkadex_sha256
+
+ - name: download polkadex binary
+   unarchive:
+     src: '{{ polkadex_binary_url | quote }}'
+     remote_src: yes
+     dest: /usr/local/bin
+     mode: '0700'
+     owner: 'polkadex'
+     group: 'polkadex'
+   when: polkadex_sha256.stdout != polkadex_binary_checksum
+
+# - name: stop polkadex service
+#   systemd:
+#     name: polkadex.service
+#     state: stopped
+#     daemon_reload: yes
+#   tags: molecule-idempotence-notest
+  
+
+
+ - name: substitute new polkadex binary
+   shell: |
+     set -o pipefail
+
+     if [ -f /usr/local/bin/polkadex-node ]; then
+       cp /usr/local/bin/polkadex-node /usr/local/bin/polkadex
+       chown polkadex:polkadex /usr/local/bin/polkadex
+       chmod 755 /usr/local/bin/polkadex
+     fi
+   args:
+     executable: /bin/bash
+   changed_when: False
+   when: polkadex_sha256.stdout != polkadex_binary_checksum
+
+
+ - name: restart polkadex service
+   import_role:
+     name: polkadex-restart-service

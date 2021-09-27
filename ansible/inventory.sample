@@ -1,0 +1,46 @@
+# Specify the nodes to setup. You can add more or remove entries, as you wish.
+
+# Validator 0
+[validator_0]
+111.111.111.11
+
+[validator_0:vars]
+ansible_user=gabe
+# Set an individual node name (optional)
+node_name=Polkadex Secure Validator
+bootnodes=/ip4/13.235.190.203/tcp/30333/p2p/12D3KooWMJ4AMmzpRbv914ZGZR6ehBhcZvGtqYid5jxSx8vXiSr7
+
+## Group all nodes
+[validator:children]
+validator_0
+
+# Common variables
+[all:vars]
+# Project name. Will be used as a prefix for the auto-generated node names
+# if an individual `nodeName` is not specified.
+project=polkadex-secure-validator
+
+# Can be left as is.
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ConnectTimeout=15'
+build_dir=$HOME/.config/polkadex-secure-validator/build/w3f/ansible
+
+# Specify which `polkadex` release zip to install. Checksum is for the polkadex-node binary inside the zip and is verified during execution.
+polkadex_binary_url='https://github.com/Polkadex-Substrate/Polkadex/releases/latest/download/PolkadexNodeUbuntu.zip'
+polkadex_binary_checksum='sha256:9a6104b019638dfb0d1e7091a7247555afb5ebc1f449829a5536a128563d5f56' #1.0.0 checksum, change for newer releases 
+
+# Nginx authentication settings (for Prometheus).
+nginx_user='prometheus'
+nginx_password='nginx_password'
+
+# Node exporter settings. Disabled by default.
+node_exporter_enabled='true'
+node_exporter_binary_url='https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz'
+node_exporter_binary_checksum='sha256:b2503fd932f85f4e5baf161268854bf5d22001869b84f00fd2d1f57b51b72424'
+
+# Polkadex service restart settings. Disabled by default (recommended). Adjust values accordingly.
+polkadex_restart_enabled='false'
+polkadex_restart_minute='0'
+polkadex_restart_hour='0'
+polkadex_restart_day='29'
+polkadex_restart_month='2'
+polkadex_restart_weekday='1'
