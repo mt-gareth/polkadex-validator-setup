@@ -22,7 +22,7 @@ fi
 
 
 PS3='Please enter your choice: '
-options=("Restart Validator" "Rotate Keys" "Validator Status" "Quit")
+options=("Restart Validator" "Rotate Keys" "Validator Status" "Current Network" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -34,6 +34,9 @@ do
             ;;
         "Validator Status")
             echo "Validator Status:"; ssh -tq $USER@$NODE_IP "sudo systemctl status polkadex.service"
+            ;;
+        "Current Network")
+            echo Connected to: $(ssh -q $USER@$NODE_IP $'curl -sH "Content-Type: application/json" -d \'{"id":1, "jsonrpc":"2.0", "method": "system_chain", "params":[]}\' http://localhost:9933 | grep -oP \'(?<="result":")[^"]*\'')
             ;;
         "Quit")
             break
