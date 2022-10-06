@@ -14,9 +14,7 @@ ExecStart=/usr/local/bin/polkadex \
   --name {{ '\"' + node_name + '\"' }} \
   --validator \
   --chain=/usr/local/bin/customSpecRaw.json \
-  {% if bootnodes is not none and bootnodes|length %}
-  --bootnodes {{ bootnodes }} \
-  {% endif %}
+  --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0' \
 
 Restart=always
 RestartSec=60

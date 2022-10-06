@@ -3,25 +3,62 @@
   hosts: all
   gather_facts: no
   tasks:
-  - name: Wait for nodes to become reachable
-    wait_for_connection:
+    - name: Wait for nodes to become reachable
+      wait_for_connection:
+
+- name: setup
+  hosts: validator
+  become: yes
+  become_user: root
+  tasks:
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+    - name: Upgrade all packages on servers
+      apt: upgrade=dist force_apt_get=yes
+
+    - name: Ansible apt install zip
+      apt:
+        name: zip
+        state: present
+
+    - name: Check if a reboot is needed on all servers
+      register: reboot_required_file
+      stat: path=/var/run/reboot-required get_md5=no
+
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
 
 - name: validator
   hosts: validator
   become: yes
   roles:
-  - polkadex-validator
+    - polkadex-validator
 
 - name: nginx-auth
   hosts: validator
   become: yes
   strategy: free
   roles:
-  - nginx-auth  
+    - nginx-auth
+
+- name: prometheus
+  hosts: validator
+  become: yes
+  strategy: free
+  roles:
+    - { role: prometheus, when: prometheus_enabled|bool }
 
 - name: node-exporter
   hosts: validator
   become: yes
   strategy: free
   roles:
-  - { role: node-exporter, when: node_exporter_enabled|bool }
+    - { role: node-exporter, when: node_exporter_enabled|bool }

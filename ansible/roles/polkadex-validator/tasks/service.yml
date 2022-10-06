@@ -2,11 +2,9 @@
 - name: cronjob for restarting polkadex service
   cron:
     name: "restart polkadex"
-    minute: "{{ polkadex_restart_minute }}"
-    hour: "{{ polkadex_restart_hour }}"
-    day: "{{ polkadex_restart_day }}"
-    month: "{{ polkadex_restart_month }}"
-    weekday: "{{ polkadex_restart_weekday }}"
+    minute: "30"
+    hour: "5"
+    day: "3"
     job: "/bin/systemctl restart polkadex.service"
   when: "polkadex_restart_enabled|default(false)|bool"
 

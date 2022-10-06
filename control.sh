@@ -1,7 +1,7 @@
 #!/bin/bash
 
-USER=CHANGE_ME
-NODE_IP=CHANGE_ME
+USER=root
+NODE_IP=XXX.XXX.XXX.XXX
 
 if [ $NODE_IP = "CHANGE_ME" ]; then
     echo "Remote user with sudo access:"

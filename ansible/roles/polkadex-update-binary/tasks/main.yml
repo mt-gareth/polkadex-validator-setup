@@ -6,6 +6,7 @@
    args:
      executable: /bin/bash
    register: polkadex_sha256
+   changed_when: false
 
  - name: download polkadex binary
    unarchive:
@@ -17,14 +18,13 @@
      group: 'polkadex'
    when: polkadex_sha256.stdout != polkadex_binary_checksum
 
-# - name: stop polkadex service
-#   systemd:
-#     name: polkadex.service
-#     state: stopped
-#     daemon_reload: yes
-#   tags: molecule-idempotence-notest
-  
-
+ - name: stop polkadex service
+   systemd:
+     name: polkadex.service
+     state: stopped
+     daemon_reload: yes
+   tags: molecule-idempotence-notest
+   when: polkadex_sha256.stdout != polkadex_binary_checksum
 
  - name: substitute new polkadex binary
    shell: |
@@ -44,3 +44,4 @@
  - name: restart polkadex service
    import_role:
      name: polkadex-restart-service
+   when: polkadex_sha256.stdout != polkadex_binary_checksum

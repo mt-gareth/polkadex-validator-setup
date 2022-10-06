@@ -6,8 +6,8 @@
 - name: remove libapr related packages
   apt:
     pkg:
-    - libapr1
-    - libaprutil1
+      - libapr1
+      - libaprutil1
     state: absent
     update_cache: yes
     autoremove: yes
@@ -18,7 +18,12 @@
     name: apache2-utils
     state: present
     update_cache: yes
-  when: not htpasswd_file.stat.exists
+
+- name: install gnutls-bin
+  apt:
+    name: gnutls-bin
+    state: present
+    update_cache: yes
 
 - name: generate .htpasswd file
   shell: |
@@ -30,6 +35,25 @@
     executable: /bin/bash
   changed_when: true
   tags: molecule-idempotence-notest
+
+- name: create prometheus ssl dir
+  file:
+    path: /etc/ssl/prometheus
+    state: directory
+    mode: '0755'
+
+- name: generate prometheus-private-key
+  shell: |
+    sudo certtool --generate-privkey --outfile /etc/ssl/prometheus/prometheus-private-key.pem
+  args:
+    executable: /bin/bash
+  changed_when: true
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: /etc/ssl/prometheus/prometheus-cert.crt
+    privatekey_path: /etc/ssl/prometheus/prometheus-private-key.pem
+    provider: selfsigned
 
 - name: create nginx config for node exporter
   copy:

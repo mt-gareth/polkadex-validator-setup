@@ -1,6 +1,6 @@
 ---
 - name: Wait for system ready
-  hosts: all
+  hosts: validator
   gather_facts: no
   tasks:
   - name: Wait for nodes to become reachable
