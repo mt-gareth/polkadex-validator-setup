@@ -19,11 +19,11 @@
     state: present
     update_cache: yes
 
-- name: install gnutls-bin
-  apt:
-    name: gnutls-bin
-    state: present
-    update_cache: yes
+#- name: install gnutls-bin
+#  apt:
+#    name: gnutls-bin
+#    state: present
+#    update_cache: yes
 
 - name: generate .htpasswd file
   shell: |

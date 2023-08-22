@@ -30,13 +30,13 @@ do
             ssh -tq $USER@$NODE_IP "sudo systemctl restart polkadex.service"; echo "Validator Restarted"
             ;;
         "Rotate Keys")
-            echo NEW KEYS: $(ssh -q $USER@$NODE_IP $'curl -sH "Content-Type: application/json" -d \'{"id":1, "jsonrpc":"2.0", "method": "author_rotateKeys", "params":[]}\' http://localhost:9933 | grep -oP \'(?<="result":")[^"]*\'')
+            echo NEW KEYS: $(ssh -q $USER@$NODE_IP $'curl -sH "Content-Type: application/json" -d \'{"id":1, "jsonrpc":"2.0", "method": "author_rotateKeys", "params":[]}\' http://localhost:9934 | grep -oP \'(?<="result":")[^"]*\'')
             ;;
         "Validator Status")
             echo "Validator Status:"; ssh -tq $USER@$NODE_IP "sudo systemctl status polkadex.service"
             ;;
         "Current Network")
-            echo Connected to: $(ssh -q $USER@$NODE_IP $'curl -sH "Content-Type: application/json" -d \'{"id":1, "jsonrpc":"2.0", "method": "system_chain", "params":[]}\' http://localhost:9933 | grep -oP \'(?<="result":")[^"]*\'')
+            echo Connected to: $(ssh -q $USER@$NODE_IP $'curl -sH "Content-Type: application/json" -d \'{"id":1, "jsonrpc":"2.0", "method": "system_chain", "params":[]}\' http://localhost:9934 | grep -oP \'(?<="result":")[^"]*\'')
             ;;
         "Quit")
             break

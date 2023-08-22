@@ -1,47 +1,102 @@
 ---
 # tasks file for polkadex-update-binary
- - name: get currently polkadex sha256
-   shell: |
-     sha256sum /usr/local/bin/polkadex | sed -n 's/^\(\S*\).*/sha256:\1/p'
-   args:
-     executable: /bin/bash
-   register: polkadex_sha256
-   changed_when: false
+- name: get current parachain sha256
+  shell: |
+    sha256sum /usr/local/bin/parachain-polkadex-node | sed -n 's/^\(\S*\).*/sha256:\1/p'
+  args:
+    executable: /bin/bash
+  register: parachain_sha256
+  changed_when: false
 
- - name: download polkadex binary
-   unarchive:
-     src: '{{ polkadex_binary_url | quote }}'
-     remote_src: yes
-     dest: /usr/local/bin
-     mode: '0700'
-     owner: 'polkadex'
-     group: 'polkadex'
-   when: polkadex_sha256.stdout != polkadex_binary_checksum
+- name: stop parachain service
+  systemd:
+    name: parachain.service
+    state: stopped
+    daemon_reload: yes
+  tags: molecule-idempotence-notest
+  when: parachain_sha256.stdout != parachain_binary_checksum
 
- - name: stop polkadex service
-   systemd:
-     name: polkadex.service
-     state: stopped
-     daemon_reload: yes
-   tags: molecule-idempotence-notest
-   when: polkadex_sha256.stdout != polkadex_binary_checksum
+- name: download parachain binary
+  get_url:
+    url: '{{ parachain_binary_url | quote }}'
+    checksum: '{{ parachain_binary_checksum | quote }}'
+    dest: /usr/local/bin/parachain-polkadex-node
+    mode: '0755'
+    owner: 'polkadex'
+    group: 'polkadex'
+  when: parachain_sha256.stdout != parachain_binary_checksum
 
- - name: substitute new polkadex binary
-   shell: |
-     set -o pipefail
+- name: download parachain spec
+  get_url:
+    url: '{{ parachain_spec_url | quote }}'
+    checksum: '{{ parachain_spec_checksum | quote }}'
+    dest: /usr/local/bin/polkadot-parachain-raw.json
+    mode: '0755'
+    owner: 'polkadex'
+    group: 'polkadex'
+  when: parachain_sha256.stdout != parachain_binary_checksum
 
-     if [ -f /usr/local/bin/polkadex-node ]; then
-       cp /usr/local/bin/polkadex-node /usr/local/bin/polkadex
-       chown polkadex:polkadex /usr/local/bin/polkadex
-       chmod 755 /usr/local/bin/polkadex
-     fi
-   args:
-     executable: /bin/bash
-   changed_when: False
-   when: polkadex_sha256.stdout != polkadex_binary_checksum
+- name: download polkadot spec
+  get_url:
+    url: '{{ polkadot_spec_url | quote }}'
+    checksum: '{{ polkadot_spec_checksum | quote }}'
+    dest: /usr/local/bin/polkadot.json
+    mode: '0755'
+    owner: 'polkadex'
+    group: 'polkadex'
+  when: parachain_sha256.stdout != parachain_binary_checksum
+
+- name: restart parachain service
+  systemd:
+    name: parachain.service
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  when: parachain_sha256.stdout != parachain_binary_checksum
 
 
- - name: restart polkadex service
-   import_role:
-     name: polkadex-restart-service
-   when: polkadex_sha256.stdout != polkadex_binary_checksum
+- name: get current polkadex sha256
+  shell: |
+    sha256sum /usr/local/bin/polkadex | sed -n 's/^\(\S*\).*/sha256:\1/p'
+  args:
+    executable: /bin/bash
+  register: polkadex_sha256
+  changed_when: false
+
+- name: download polkadex binary
+  unarchive:
+    src: '{{ polkadex_binary_url | quote }}'
+    remote_src: yes
+    dest: /usr/local/bin
+    mode: '0700'
+    owner: 'polkadex'
+    group: 'polkadex'
+  when: polkadex_sha256.stdout != polkadex_binary_checksum
+
+- name: stop polkadex service
+  systemd:
+    name: polkadex.service
+    state: stopped
+    daemon_reload: yes
+  tags: molecule-idempotence-notest
+  when: polkadex_sha256.stdout != polkadex_binary_checksum
+
+- name: substitute new polkadex binary
+  shell: |
+    set -o pipefail
+
+    if [ -f /usr/local/bin/polkadex-node ]; then
+      cp /usr/local/bin/polkadex-node /usr/local/bin/polkadex
+      chown polkadex:polkadex /usr/local/bin/polkadex
+      chmod 755 /usr/local/bin/polkadex
+    fi
+  args:
+    executable: /bin/bash
+  changed_when: False
+  when: polkadex_sha256.stdout != polkadex_binary_checksum
+
+
+- name: restart polkadex service
+  import_role:
+    name: polkadex-restart-service
+  when: polkadex_sha256.stdout != polkadex_binary_checksum

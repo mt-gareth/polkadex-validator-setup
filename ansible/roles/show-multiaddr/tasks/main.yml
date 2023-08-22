@@ -1,6 +1,6 @@
 - name: save peerId
   uri:
-    url: http://localhost:9933
+    url: http://localhost:9934
     method: "POST"
     body_format: json
     body: |

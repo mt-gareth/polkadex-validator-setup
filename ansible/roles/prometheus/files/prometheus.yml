@@ -15,6 +15,10 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ["localhost:9615"]
+  - job_name: "parachain_node"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["localhost:9616"]
   - job_name: node
     basic_auth:
       username: prometheus

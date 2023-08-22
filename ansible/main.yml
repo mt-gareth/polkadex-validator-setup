@@ -41,24 +41,3 @@
   become: yes
   roles:
     - polkadex-validator
-
-- name: nginx-auth
-  hosts: validator
-  become: yes
-  strategy: free
-  roles:
-    - nginx-auth
-
-- name: prometheus
-  hosts: validator
-  become: yes
-  strategy: free
-  roles:
-    - { role: prometheus, when: prometheus_enabled|bool }
-
-- name: node-exporter
-  hosts: validator
-  become: yes
-  strategy: free
-  roles:
-    - { role: node-exporter, when: node_exporter_enabled|bool }

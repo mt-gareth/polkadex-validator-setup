@@ -1,0 +1,26 @@
+{# --- PREPARE VARIABLES #}
+{% set node_name = hostvars[inventory_hostname].node_name|default(None) %}
+{% set bootnodes = hostvars[inventory_hostname].bootnodes|default(None) %}
+{# --- #}
+[Unit]
+Description=Polkadex Parachain Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=polkadex
+Group=polkadex
+ExecStart=/usr/local/bin/parachain-polkadex-node \
+  --chain=/usr/local/bin/polkadot-parachain-raw.json \
+  --port 40333 --ws-port 9902 --rpc-port 8844 \
+  --bootnodes /ip4/3.108.191.170/tcp/40333/p2p/12D3KooWKi39o5WvzPTFz8W2KMqjP5c9HWoY2naYGPVF1YANCFnC \
+  --name {{ '\"' + node_name + '-parachain\"' }} \
+  --telemetry-url 'wss://telemetry.polkadot.io/submit/ 0' \
+  -- --execution wasm --chain /usr/local/bin/polkadot.json \
+  --port 30343 --ws-port 9977 --state-pruning 256 --sync warp \
+
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
